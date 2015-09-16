@@ -111,7 +111,7 @@ class _resizer(object):
                 thumbnail = self.resize(image)
                 thumbnail.save(filename)
                 logger.info("Generated Thumbnail {0}".format(path.basename(filename)))
-            except IOError:
+            except (IOError, KeyError):
                 logger.info("Generating Thumbnail for {0} skipped".format(path.basename(filename)))
 
 
