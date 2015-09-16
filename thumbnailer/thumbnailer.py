@@ -22,6 +22,7 @@ DEFAULT_THUMBNAIL_SIZES = {
 }
 DEFAULT_TEMPLATE = """<a href="{url}" rel="shadowbox" title="{filename}"><img src="{thumbnail}" alt="{filename}"></a>"""
 DEFAULT_GALLERY_THUMB = "thumbnail_square"
+DEFAULT_THUMBNAIL_KEEP_DIR_STRUCT = True
 
 class _resizer(object):
     """ Resizes based on a text specification, see readme """
@@ -106,7 +107,7 @@ class _resizer(object):
         if not path.exists(out_path):
             os.makedirs(out_path)
         if not path.exists(filename):
-            try:
+            try: 
                 image = Image.open(in_path)
                 thumbnail = self.resize(image)
                 thumbnail.save(filename)
@@ -136,6 +137,13 @@ def resize_thumbnails(pelican):
         for filename in filenames:
             for name, resizer in resizers.items():
                 in_filename = path.join(dirpath, filename)
+                #print "working on: " + str(in_filename)
+                if (pelican.settings.get('THUMBNAIL_KEEP_DIR_STRUCT', DEFAULT_THUMBNAIL_KEEP_DIR_STRUCT)):
+                    out_path = path.join(pelican.settings['OUTPUT_PATH'],
+                                         pelican.settings.get('THUMBNAIL_DIR', DEFAULT_THUMBNAIL_DIR),
+                                         "".join((os.curdir, os.sep, in_filename[len(in_path):(len(in_filename)-len(filename))])))
+                    if not os.path.exists(out_path):
+                        os.makedirs(out_path)
                 logger.debug("Processing thumbnail {0}=>{1}".format(filename, name))
                 if pelican.settings.get('THUMBNAIL_KEEP_NAME', False):
                     resizer.resize_file_to(in_filename, path.join(out_path, name), True)
